@@ -108,11 +108,18 @@ func setClockSequence(seq int) {
 }
 
 // Time returns the time in 100s of nanoseconds since 15 Oct 1582 encoded in
-// uuid.  The time is only defined for version 1 and 2 UUIDs.
+// uuid.  The time is only defined for version 1, 2 and 6  UUIDs.
 func (uuid UUID) Time() Time {
-	time := int64(binary.BigEndian.Uint32(uuid[0:4]))
-	time |= int64(binary.BigEndian.Uint16(uuid[4:6])) << 32
-	time |= int64(binary.BigEndian.Uint16(uuid[6:8])&0xfff) << 48
+	var time int64
+	if uuid.Version() == 6 {
+		time = int64(binary.BigEndian.Uint32(uuid[0:4])) << 32
+		time |= int64(binary.BigEndian.Uint16(uuid[4:6])) << 12
+		time |= int64(binary.BigEndian.Uint16(uuid[6:8]) & 0xfff)
+	} else {
+		time = int64(binary.BigEndian.Uint32(uuid[0:4]))
+		time |= int64(binary.BigEndian.Uint16(uuid[4:6])) << 32
+		time |= int64(binary.BigEndian.Uint16(uuid[6:8])&0xfff) << 48
+	}
 	return Time(time)
 }
 

@@ -298,6 +298,22 @@ func TestCoding(t *testing.T) {
 		t.Errorf("%s: decoded to %s, expected %s", text, uuid, data)
 	}
 }
+func TestParsev6(t *testing.T) {
+	text := "01eb4e2f-8362-6a80-8001-000102030405"
+	data := UUID{1, 235, 78, 47, 131, 98, 106, 128, 128, 1, 0, 1, 2, 3, 4, 5}
+
+	if v := data.String(); v != text {
+		t.Errorf("%x: encoded to %s, expected %s", data, v, text)
+	}
+
+	uuid, err := Parse(text)
+	if err != nil {
+		t.Errorf("Parse returned unexpected error %v", err)
+	}
+	if data != uuid {
+		t.Errorf("%s: decoded to %s, expected %s", text, uuid, data)
+	}
+}
 
 func TestVersion1(t *testing.T) {
 	uuid1, err := NewUUID()
@@ -621,6 +637,16 @@ func BenchmarkParseBytesCopy(b *testing.B) {
 func BenchmarkNew(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		New()
+	}
+}
+func BenchmarkUUIDv6(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewUUIDv6()
+	}
+}
+func BenchmarkUUID(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewUUID()
 	}
 }
 
